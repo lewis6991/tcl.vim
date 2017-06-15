@@ -21,6 +21,8 @@ proc run { } {
             dwqdqwdq
         }
 
+        add {"some string"}
+
         hello [
             dwqdqwdq
             dqwdqwd

@@ -39,7 +39,7 @@ syn keyword tclTodo contained TODO
 " Highlight special characters (those which have a backslash) differently
 syn match tclSpecial contained "\\\d\d\d\=\|\\."
 
-syn region tclString start=+^"+ end=+"+ contains=tclSpecial,tclLineContinue skip=+\\\\\|\\"+ extend
+syn region tclString start=+"+ end=+"+ contains=tclSpecial,tclLineContinue skip=+\\\\\|\\"+ extend
 syn region tclString start=+[^\\]"+ms=s+1  end=+"+ contains=tclSpecial,tclLineContinue skip=+\\\\\|\\"+ extend
 
 syn match tclLineContinue "\\\s*$"
