@@ -22,25 +22,30 @@ function! GetTclIndent()
         return 0
     endif
 
-    if getline(v:lnum) =~ '^\s*}'
-        return indent(s:SearchForBlockStart('{', '', '}', v:lnum))
-    elseif getline(v:lnum) =~ '^\s*\]'
-        return indent(s:SearchForBlockStart('\[', '', '\]', v:lnum))
+    let l:context = reverse(map(synstack(v:lnum, 1), 'synIDattr(v:val, "name")'))
+
+    let l:indent_level = 0
+
+    for item in l:context
+        if    item == "tclProcBody" ||
+            \ item == "tclNamespaceEvalBody" ||
+            \ item == "tclBlockBody" ||
+            \ item == "tclCmdSubBlockBody"
+            let l:indent_level += 1
+        endif
+    endfor
+
+    let l:line = getline(v:lnum)
+    let l:prev_line = getline(prevnonblank(v:lnum-1))
+
+    if    l:line =~ '^\s*[}\]]\s*$' ||
+        \ l:line =~ '^\s*}\s*\(else\(if\)\?\s*\)\?{\s*$'
+        let l:indent_level -= 1
     endif
 
-    let l:lnum = prevnonblank(v:lnum - 1)
-
-    if getline(l:lnum) =~ '[[{]\s*$'
-        return indent(l:lnum) + &sw
-    else
-        return indent(l:lnum)
+    if l:prev_line =~ '\\s*$'
+        let l:indent_level += 1
     endif
 
-endfunction
-
-" For any kind of block with a provided end pattern and start pattern, return
-" the line of the start of the block.
-function! s:SearchForBlockStart(start_wd, mid_wd, end_wd, current_line_no)
-    call cursor(a:current_line_no, 1)
-    return searchpair(a:start_wd, a:mid_wd, a:end_wd, 'bnW', "")
+    return l:indent_level * &sw
 endfunction

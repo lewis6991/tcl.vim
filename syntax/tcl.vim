@@ -30,9 +30,6 @@ syn keyword tclStatement   scan seek socket split subst tell time trace
 syn keyword tclStatement   unknown unset update uplevel upvar vwait
 syn keyword tclStatement   exist env source global set unset puts lappend
 
-" Make proc a keyword for some colour variation.
-syn keyword tclKeyword     proc
-
 syn match tclNamespace "$\(\(::\)\?\([[:alnum:]_]*::\)*\)\a[a-zA-Z0-9_]*"
 syn match tclNamespace "${[^}]*}"
 
@@ -67,24 +64,64 @@ syn match tclNumber   "\<\d\+e[-+]\=\d\+[fl]\=\>"
 " hex number
 syn match tclNumber   "0x[0-9a-f]\+"
 
-syntax match tclIdentifier   "\<[a-z_][a-z0-9_]*\>"
 syn case match
 
 syn match tclOperator  "[(){}\[\]/]"
 syn match tclComment   "\(^\|;\)\s*\zs#.*" contains=tclTodo,@Spell
 
+
 "-------------------------------------------------------------------------------
 " Proc folding
 "-------------------------------------------------------------------------------
-"Top level {} should belong to a proc.
-syn region tclProc start="{" end="}"
-            \ skip="^\s*#.*"
-            \ contains=ALLBUT,tclProc
-            \ fold transparent keepend extend
+" Make proc a keyword for some colour variation.
+syn keyword tclKeyword     proc nextgroup=tclProcName skipwhite skipempty
 
-syn region tclBlock start="{" end="}"
-            \ skip="^\s*#.*"
-            \ transparent keepend extend
+syn match tclProcName "\w\+" contained nextgroup=tclProcArgs skipwhite skipempty
+
+syn region tclProcArgs
+    \ matchgroup=tclBlock
+    \ start="{"
+    \ end="}"
+    \ nextgroup=tclProcBody skipwhite skipempty
+
+syn region tclProcBody
+    \ matchgroup=tclBlock
+    \ start="{"
+    \ end="}"
+    \ transparent
+    \ fold
+
+"-------------------------------------------------------------------------------
+" Namespace folding
+"-------------------------------------------------------------------------------
+" Make proc a keyword for some colour variation.
+syn match tclKeyword "namespace\s\+eval" nextgroup=tclNamespaceEvalName skipwhite skipempty
+
+syn match tclNamespaceEvalName "\w\+" contained nextgroup=tclNamespaceEvalBody skipwhite skipempty
+
+syn region tclNamespaceEvalBody
+    \ matchgroup=tclBlock
+    \ start="{"
+    \ end="}"
+    \ transparent
+    \ fold
+
+"-------------------------------------------------------------------------------
+" Block folding
+"-------------------------------------------------------------------------------
+syn region tclBlockBody
+    \ matchgroup=tclBlock
+    \ start="{"
+    \ end="}"
+    \ transparent
+
+syn region tclCmdSubBlockBody
+    \ matchgroup=tclCmdSubBlock
+    \ start="\["
+    \ end="\]"
+    \ transparent
+
+"-------------------------------------------------------------------------------
 
 set foldmethod=syntax
 
@@ -104,5 +141,7 @@ hi def link tclLineContinue WarningMsg
 hi def link tclExceptions   Exception
 hi def link tclNamespace    Identifier
 hi def link tclOperator     Special
+hi def link tclBlock        Special
+hi def link tclCmdSubBlock  Special
 
 "-------------------------------------------------------------------------------
