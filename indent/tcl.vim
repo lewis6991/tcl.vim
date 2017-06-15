@@ -38,7 +38,7 @@ function! GetTclIndent()
     let l:line = getline(v:lnum)
     let l:prev_line = getline(prevnonblank(v:lnum-1))
 
-    if    l:line =~ '^\s*[}\]]\s*$' ||
+    if    l:line =~ '^\s*[}\]]' ||
         \ l:line =~ '^\s*}\s*\(else\(if\)\?\s*\)\?{\s*$'
         let l:indent_level -= 1
     endif
