@@ -17,6 +17,16 @@ if exists("*GetTclIndent")
     finish
 endif
 
+let s:indent_syntax_ids = [
+    \     "tclBlock",
+    \     "tclBlockBody",
+    \     "tclNamespaceEvalBody",
+    \     "tclProcBody",
+    \     "tclString",
+    \     "tclStringCurly",
+    \     "tclCmdSubBlockBody"
+    \ ]
+
 function! GetTclIndent()
     if v:lnum == 1
         return 0
@@ -27,10 +37,7 @@ function! GetTclIndent()
     let l:indent_level = 0
 
     for item in l:context
-        if    item == "tclProcBody" ||
-            \ item == "tclNamespaceEvalBody" ||
-            \ item == "tclBlockBody" ||
-            \ item == "tclCmdSubBlockBody"
+        if index(s:indent_syntax_ids, item) >= 0
             let l:indent_level += 1
         endif
     endfor

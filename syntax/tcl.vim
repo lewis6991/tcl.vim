@@ -1,13 +1,11 @@
 " Vim syntax file
 " Language:     Tcl
 " Maintainer:   Lewis Russell <lewis6991@gmail.com>
-" Last Change:  2016 Jul 20
-" Version:      1.0
+" Last Change:  2017 Jun 20
+" Version:      1.1
 
 if exists("b:current_syntax")
     finish
-else
-    let b:current_syntax = "tcl"
 endif
 
 syntax sync fromstart
@@ -30,7 +28,7 @@ syn keyword tclStatement   msgcat open parray pid
 syn keyword tclStatement   pwd read regexp registry regsub rename resource
 syn keyword tclStatement   scan seek socket split subst tell time trace
 syn keyword tclStatement   unknown unset update uplevel upvar vwait
-syn keyword tclStatement   exist env source global set unset puts lappend
+syn keyword tclStatement   exist env source global set unset puts lappend variable
 
 syn match tclNamespace "$\(\(::\)\?\([[:alnum:]_]*::\)*\)\a[a-zA-Z0-9_]*"
 syn match tclNamespace "${[^}]*}"
@@ -41,8 +39,22 @@ syn keyword tclTodo contained TODO
 " Highlight special characters (those which have a backslash) differently
 syn match tclSpecial contained "\\\d\d\d\=\|\\."
 
-syn region tclString start=+"+ end=+"+ contains=tclSpecial,tclLineContinue skip=+\\\\\|\\"+ extend
-syn region tclString start=+[^\\]"+ms=s+1  end=+"+ contains=tclSpecial,tclLineContinue skip=+\\\\\|\\"+ extend
+syn region tclString
+    \ start=+"+
+    \ end=+"+
+    \ contains=tclSpecial,tclLineContinue,tclStringCurly
+    \ skip=+\\\\\|\\"+
+    \ extend
+
+syn region tclString
+    \ start=+[^\\]"+ms=s+1
+    \ end=+"+
+    \ contains=tclSpecial,tclLineContinue,tclStringCurly
+    \ skip=+\\\\\|\\"+
+    \ extend
+
+syn match tclStringCurly "{"
+syn match tclStringCurly "}"
 
 syn match tclLineContinue "\\\s*$"
 
@@ -76,7 +88,7 @@ syn match tclComment   "\(^\|;\)\s*\zs#.*" contains=tclTodo,@Spell
 " Proc folding
 "-------------------------------------------------------------------------------
 " Make proc a keyword for some colour variation.
-syn keyword tclKeyword     proc nextgroup=tclProcName skipwhite skipempty
+syn keyword tclProc proc nextgroup=tclProcName skipwhite skipempty
 
 syn match tclProcName "\w\+" contained nextgroup=tclProcArgs skipwhite skipempty
 
@@ -84,6 +96,7 @@ syn region tclProcArgs
     \ matchgroup=tclBlock
     \ start="{"
     \ end="}"
+    \ contains=tclBlockBody
     \ nextgroup=tclProcBody skipwhite skipempty
 
 syn region tclProcBody
@@ -99,7 +112,7 @@ syn region tclProcBody
 " Make proc a keyword for some colour variation.
 syn match tclKeyword "namespace\s\+eval" nextgroup=tclNamespaceEvalName skipwhite skipempty
 
-syn match tclNamespaceEvalName "\w\+" contained nextgroup=tclNamespaceEvalBody skipwhite skipempty
+syn match tclNamespaceEvalName "\(\w\|::\)\+" contained nextgroup=tclNamespaceEvalBody skipwhite skipempty
 
 syn region tclNamespaceEvalBody
     \ matchgroup=tclBlock
@@ -136,6 +149,7 @@ hi def link tclConditional  Conditional
 hi def link tclLooping      Repeat
 hi def link tclNumber       Number
 hi def link tclString       String
+hi def link tclStringCurly  SpecialChar
 hi def link tclComment      Comment
 hi def link tclSpecial      Special
 hi def link tclTodo         Todo
@@ -145,5 +159,8 @@ hi def link tclNamespace    Identifier
 hi def link tclOperator     Special
 hi def link tclBlock        Special
 hi def link tclCmdSubBlock  Special
+hi def link tclProc         Statement
+
+let b:current_syntax = "tcl"
 
 "-------------------------------------------------------------------------------
