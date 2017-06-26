@@ -1,8 +1,8 @@
 " Vim syntax file
 " Language:     Tcl
 " Maintainer:   Lewis Russell <lewis6991@gmail.com>
-" Last Change:  2017 Jun 20
-" Version:      1.1
+" Last Change:  2017 Jun 23
+" Version:      1.2
 
 if exists("b:current_syntax")
     finish
@@ -30,27 +30,21 @@ syn keyword tclStatement   scan seek socket split subst tell time trace
 syn keyword tclStatement   unknown unset update uplevel upvar vwait
 syn keyword tclStatement   exist env source global set unset puts lappend variable
 
-syn match tclNamespace "$\(\(::\)\?\([[:alnum:]_]*::\)*\)\a[a-zA-Z0-9_]*"
+syn match tclNamespace "$\(\(::\)\?\([a-zA-Z0-9_]*::\)*\)\a[a-zA-Z0-9_]*"
 syn match tclNamespace "${[^}]*}"
 
 syn keyword tclTodo contained TODO
 
 " String and Character constants
 " Highlight special characters (those which have a backslash) differently
-syn match tclSpecial contained "\\\d\d\d\=\|\\."
+syn match tclSpecial "\\\d\d\d\="
+syn match tclSpecial "\\."
 
 syn region tclString
     \ start=+"+
     \ end=+"+
     \ contains=tclSpecial,tclLineContinue,tclStringCurly
-    \ skip=+\\\\\|\\"+
-    \ extend
-
-syn region tclString
-    \ start=+[^\\]"+ms=s+1
-    \ end=+"+
-    \ contains=tclSpecial,tclLineContinue,tclStringCurly
-    \ skip=+\\\\\|\\"+
+    \ containedin=ALLBUT,tclComment,tclString,tclSpecial
     \ extend
 
 syn match tclStringCurly "{"
@@ -80,7 +74,7 @@ syn match tclNumber   "0x[0-9a-f]\+"
 
 syn case match
 
-syn match tclOperator  "[(){}\[\]/]"
+syn match tclOperator  "[(){}[\]/]"
 syn match tclComment   "\(^\|;\)\s*\zs#.*" contains=tclTodo,@Spell
 
 
@@ -153,9 +147,9 @@ hi def link tclStringCurly  SpecialChar
 hi def link tclComment      Comment
 hi def link tclSpecial      Special
 hi def link tclTodo         Todo
-hi def link tclLineContinue WarningMsg
 hi def link tclExceptions   Exception
 hi def link tclNamespace    Identifier
+hi def link tclLineContinue Special
 hi def link tclOperator     Special
 hi def link tclBlock        Special
 hi def link tclCmdSubBlock  Special
