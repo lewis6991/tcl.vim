@@ -84,13 +84,17 @@ syn match tclComment   "\(^\|;\)\s*\zs#.*" contains=tclTodo,@Spell
 " Make proc a keyword for some colour variation.
 syn keyword tclProc proc nextgroup=tclProcName skipwhite skipempty
 
-syn match tclProcName "\w\+" contained nextgroup=tclProcArgs skipwhite skipempty
+syn match tclProcName "\w\+" contained nextgroup=tclProcArgs,tclProcArg skipwhite skipempty
 
 syn region tclProcArgs
     \ matchgroup=tclBlock
     \ start="{"
     \ end="}"
     \ contains=tclBlockBody
+    \ nextgroup=tclProcBody skipwhite skipempty
+
+syn match tclProcArg
+    \ "\k\w*"
     \ nextgroup=tclProcBody skipwhite skipempty
 
 syn region tclProcBody

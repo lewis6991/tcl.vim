@@ -1,4 +1,4 @@
-proc run { } {
+proc run {} {
 
     if ($hello) {
         do_something
@@ -27,6 +27,15 @@ proc run { } {
             dwqdqwdq
             dqwdqwd
         ]
+
+        cmd \
+            "string" \
+            "string"
+
+        set some_list "
+            hello
+            hi
+        "
     }
 }
 

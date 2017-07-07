@@ -22,9 +22,12 @@ let s:indent_syntax_ids = [
     \     "tclBlockBody",
     \     "tclNamespaceEvalBody",
     \     "tclProcBody",
+    \     "tclCmdSubBlockBody"
+    \ ]
+
+let s:no_indent_syntax_ids = [
     \     "tclString",
     \     "tclStringCurly",
-    \     "tclCmdSubBlockBody"
     \ ]
 
 function! GetTclIndent()
@@ -36,6 +39,11 @@ function! GetTclIndent()
 
     let l:indent_level = 0
 
+
+    if index(s:no_indent_syntax_ids, l:context[0]) >= 0
+        return indent(v:lnum)
+    endif
+
     for item in l:context
         if index(s:indent_syntax_ids, item) >= 0
             let l:indent_level += 1
@@ -45,7 +53,7 @@ function! GetTclIndent()
     let l:line = getline(v:lnum)
     let l:prev_line = getline(prevnonblank(v:lnum-1))
 
-    if l:line =~ '^\s*[}\]"]' " De-indent on }, ], \"
+    if l:line =~ '^\s*[}\]]' " De-indent on }, ]
         let l:indent_level -= 1
     endif
 
