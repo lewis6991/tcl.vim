@@ -42,4 +42,9 @@ proc run {} {
 namespace eval nms {
 
 }
+
+proc ns::main {} {
+    puts "HELLO WORLD"
+}
+
 # vim: set sw=4 :
