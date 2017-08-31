@@ -92,6 +92,7 @@ syn region tclProcArgs
     \ end="}"
     \ contains=tclBlockBody
     \ nextgroup=tclProcBody skipwhite skipempty
+    \ fold
 
 syn match tclProcArg
     \ "\k\w*"
@@ -105,6 +106,12 @@ syn region tclProcBody
     \ end="}"
     \ transparent
     \ fold
+
+"-------------------------------------------------------------------------------
+" tepam::procedure folding
+"-------------------------------------------------------------------------------
+syn match tclTepamProc "tepam::procedure" nextgroup=tclTepamProcName skipwhite skipempty
+syn match tclTepamProcName "[a-zA-Z0-9_:]\+\|{.*}" contained nextgroup=tclProcArgs skipwhite skipempty
 
 "-------------------------------------------------------------------------------
 " Namespace folding
