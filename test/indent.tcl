@@ -23,9 +23,9 @@ proc run {} {
 
         add {"some string"}
 
-        hello [
-            dwqdqwdq
-            dqwdqwd
+        hello [ \
+            dwqdqwdq \
+            dqwdqwd \
         ]
 
         cmd \

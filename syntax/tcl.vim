@@ -14,15 +14,16 @@ syntax sync fromstart
 " Keywords
 "-------------------------------------------------------------------------------
 syn keyword tclConditional if then else elseif switch
-syn keyword tclLooping     while for foreach continue break
+syn keyword tclLooping     while for foreach
 syn keyword tclExceptions  catch error throw try finally
 
-syn keyword tclStatement   return after append auto_execok auto_import auto_load
+syn keyword tclStatement   return eval continue break
+syn keyword tclStatement   after append auto_execok auto_import auto_load
 syn keyword tclStatement   auto_qualify auto_reset expr
 syn keyword tclStatement   bgerror binary cd chan clock close concat dde dict encoding
-syn keyword tclStatement   eof eval exec exit fblocked fconfigure fcopy file
+syn keyword tclStatement   eof exec exit fblocked fconfigure fcopy file
 syn keyword tclStatement   fileevent flush gets glob history http
-syn keyword tclStatement   incr info interp join lindex linsert list
+syn keyword tclStatement   incr interp join lindex linsert list
 syn keyword tclStatement   llength load lrange lreplace lsearch lset memory
 syn keyword tclStatement   msgcat open parray pid
 syn keyword tclStatement   pwd read regexp registry regsub rename resource
@@ -30,8 +31,36 @@ syn keyword tclStatement   scan seek socket split subst tell time trace
 syn keyword tclStatement   unknown unset update uplevel upvar vwait
 syn keyword tclStatement   exist env source global set unset puts lappend variable
 
+syn keyword tclStatement package
+    \ nextgroup=tclPackageOption,tclOptionError
+    \ skipwhite skipempty
+
+syn keyword tclPackageOption
+    \ forget ifneeded names prefer present provide require unknown vcompare
+    \ versions vsatisfies
+
+syn keyword tclStatement namespace
+    \ nextgroup=tclNamespaceOption,tclOptionError
+    \ skipwhite skipempty
+
+syn keyword tclNamespaceOption
+    \ children code current delete ensemble eval exists export forget import
+    \ inscope origin parent path qualifiers tail unknown upvar which
+
+syn keyword tclStatement info
+    \ nextgroup=tclInfoOption,tclOptionError
+    \ skipwhite skipempty
+
+syn keyword tclInfoOption
+    \ args body class cmdcount commands complete coroutine default errorstack
+    \ exists frame functions globals hostname level library loaded locals
+    \ nameofexecutable object patchlevel procs script sharedlibextension
+    \ tclversion or vars
+
+syn match tclOptionError "\a[a-zA-Z0-9_]*" contained
+
 syn match tclNamespace "$\(\(::\)\?\([a-zA-Z0-9_]*::\)*\)\a[a-zA-Z0-9_]*"
-syn match tclNamespace "${[^}]*}"
+syn match tclNamespace "${[^}]*}" extend
 
 syn keyword tclTodo contained TODO
 
@@ -43,12 +72,16 @@ syn match tclSpecial "\\."
 syn region tclString
     \ start=+"+
     \ end=+"+
-    \ contains=tclSpecial,tclLineContinue,tclStringCurly
-    \ containedin=ALLBUT,tclComment,tclString,tclSpecial
+    \ contains=tclSpecial,tclLineContinue,tclCmdSubBlockBody,tclNamespace
+    \ containedin=ALLBUT,tclComment,tclString,tclString1,tclSpecial
     \ extend
 
-syn match tclStringCurly "{"
-syn match tclStringCurly "}"
+syn region tclString1
+    \ start=+^\s*\zs"+
+    \ end=+"+
+    \ contains=tclSpecial,tclLineContinue,tclCmdSubBlockBody,tclNamespace
+    \ containedin=ALLBUT,tclComment,tclString,tclString1,tclSpecial
+    \ extend
 
 syn match tclLineContinue "\\\s*$"
 
@@ -63,6 +96,7 @@ syn match tclNumber   "\<\d\+\(u\=l\=\|lu\|f\)\>"
 " floating point number, with dot, optional exponent
 syn match tclNumber      "\<\d\+\.\d*\(e[-+]\=\d\+\)\=[fl]\=\>"
 
+
 " floating point number, starting with a dot, optional exponent
 syn match tclNumber      "\.\d\+\(e[-+]\=\d\+\)\=[fl]\=\>"
 
@@ -75,7 +109,7 @@ syn match tclNumber   "0x[0-9a-f]\+"
 syn case match
 
 syn match tclOperator  "[(){}[\]/]"
-syn match tclComment   "\(^\|;\)\s*\zs#.*" contains=tclTodo,@Spell
+syn match tclComment   "\(^\|;\)\s*\zs#.*" contains=tclTodo,@Spell extend
 
 
 "-------------------------------------------------------------------------------
@@ -92,6 +126,7 @@ syn region tclProcArgs
     \ end="}"
     \ contains=tclBlockBody
     \ nextgroup=tclProcBody skipwhite skipempty
+    \ extend
     \ fold
 
 syn match tclProcArg
@@ -105,6 +140,8 @@ syn region tclProcBody
     \ start="{"
     \ end="}"
     \ transparent
+    \ keepend
+    \ extend
     \ fold
 
 "-------------------------------------------------------------------------------
@@ -126,6 +163,7 @@ syn region tclNamespaceEvalBody
     \ start="{"
     \ end="}"
     \ transparent
+    \ extend
     \ fold
 
 "-------------------------------------------------------------------------------
@@ -136,6 +174,8 @@ syn region tclBlockBody
     \ start="{"
     \ end="}"
     \ transparent
+    \ keepend
+    \ extend
 
 syn region tclCmdSubBlockBody
     \ matchgroup=tclCmdSubBlock
@@ -150,23 +190,27 @@ set foldmethod=syntax
 "-------------------------------------------------------------------------------
 " Highlight
 "-------------------------------------------------------------------------------
-hi def link tclStatement    Statement
-hi def link tclKeyword      Keyword
-hi def link tclConditional  Conditional
-hi def link tclLooping      Repeat
-hi def link tclNumber       Number
-hi def link tclString       String
-hi def link tclStringCurly  SpecialChar
-hi def link tclComment      Comment
-hi def link tclSpecial      Special
-hi def link tclTodo         Todo
-hi def link tclExceptions   Exception
-hi def link tclNamespace    Identifier
-hi def link tclLineContinue Special
-hi def link tclOperator     Special
-hi def link tclBlock        Special
-hi def link tclCmdSubBlock  Special
-hi def link tclProc         Statement
+hi def link tclStatement       Statement
+hi def link tclKeyword         Keyword
+hi def link tclConditional     Conditional
+hi def link tclLooping         Repeat
+hi def link tclNumber          Number
+hi def link tclString          String
+hi def link tclString1         String
+hi def link tclComment         Comment
+hi def link tclSpecial         Special
+hi def link tclTodo            Todo
+hi def link tclExceptions      Exception
+hi def link tclNamespace       Identifier
+hi def link tclLineContinue    Special
+hi def link tclOperator        Special
+hi def link tclBlock           Special
+hi def link tclCmdSubBlock     Special
+hi def link tclProc            Statement
+hi def link tclNamespaceOption Statement
+hi def link tclPackageOption   Statement
+hi def link tclInfoOption      Statement
+hi def link tclOptionError     Error
 
 let b:current_syntax = "tcl"
 

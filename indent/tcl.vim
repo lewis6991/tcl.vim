@@ -13,22 +13,18 @@ let b:did_indent = 1
 
 setlocal indentexpr=GetTclIndent()
 
-if exists("*GetTclIndent")
+if exists('*GetTclIndent')
     finish
 endif
 
 let s:indent_syntax_ids = [
-    \     "tclBlock",
-    \     "tclBlockBody",
-    \     "tclNamespaceEvalBody",
-    \     "tclProcBody",
-    \     "tclCmdSubBlockBody"
+    \     'tclBlock',
+    \     'tclBlockBody',
+    \     'tclNamespaceEvalBody',
+    \     'tclProcBody',
+    \     'tclProcArgs',
     \ ]
 
-let s:no_indent_syntax_ids = [
-    \     "tclString",
-    \     "tclStringCurly",
-    \ ]
 
 function! GetTclIndent()
     if v:lnum == 1
@@ -38,10 +34,24 @@ function! GetTclIndent()
     let l:context = reverse(map(synstack(v:lnum, 1), 'synIDattr(v:val, "name")'))
 
     let l:indent_level = 0
+    let l:indent_offset = 0
 
+    let l:line = getline(v:lnum)
+    let l:prev_line = getline(prevnonblank(v:lnum-1))
 
-    if index(s:no_indent_syntax_ids, l:context[0]) >= 0
-        return indent(v:lnum)
+    if l:context[0] =~# 'tclString.*'
+        if l:prev_line !~# '\\s*$'
+            return indent(v:lnum)
+        else
+            let l:indent_level += 1
+            if l:context[0] ==# 'tclString1'
+                let l:indent_offset += 1
+            endif
+        endif
+    else
+        if l:prev_line =~# '\\s*$'
+            let l:indent_level += 1
+        endif
     endif
 
     for item in l:context
@@ -50,16 +60,12 @@ function! GetTclIndent()
         endif
     endfor
 
-    let l:line = getline(v:lnum)
-    let l:prev_line = getline(prevnonblank(v:lnum-1))
-
-    if l:line =~ '^\s*[}\]]' " De-indent on }, ]
+    if l:context[0] ==# 'tclCmdSubBlockBody'
+        \ && l:line =~# '^\s*[}\]]' " De-indent on }, ]
+        let l:indent_level -= 1
+    elseif l:line =~# '^\s*[}]' " De-indent on }
         let l:indent_level -= 1
     endif
 
-    if l:prev_line =~ '\\s*$'
-        let l:indent_level += 1
-    endif
-
-    return l:indent_level * &sw
+    return l:indent_level * &sw + l:indent_offset
 endfunction
