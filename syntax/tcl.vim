@@ -26,7 +26,7 @@ syn keyword tclStatement   fileevent flush gets glob history http
 syn keyword tclStatement   incr interp join lindex linsert list
 syn keyword tclStatement   llength load lrange lreplace lsearch lset memory
 syn keyword tclStatement   msgcat open parray pid
-syn keyword tclStatement   pwd read regexp registry regsub rename resource
+syn keyword tclStatement   pwd read registry regsub rename resource
 syn keyword tclStatement   scan seek socket split subst tell time trace
 syn keyword tclStatement   unknown unset update uplevel upvar vwait
 syn keyword tclStatement   exist env source global set unset puts lappend variable
@@ -68,19 +68,20 @@ syn keyword tclTodo contained TODO
 " Highlight special characters (those which have a backslash) differently
 syn match tclSpecial "\\\d\d\d\="
 syn match tclSpecial "\\."
+syn match tclSpecial "\\." contained containedin=ALLBUT,tclSpecial extend contains=NONE
 
 syn region tclString
     \ start=+"+
     \ end=+"+
     \ contains=tclSpecial,tclLineContinue,tclCmdSubBlockBody,tclNamespace
-    \ containedin=ALLBUT,tclComment,tclString,tclString1,tclSpecial
+    \ containedin=ALLBUT,tclComment,tclString,tclString1,tclSpecial,tclLitBlock
     \ extend
 
 syn region tclString1
     \ start=+^\s*\zs"+
     \ end=+"+
     \ contains=tclSpecial,tclLineContinue,tclCmdSubBlockBody,tclNamespace
-    \ containedin=ALLBUT,tclComment,tclString,tclString1,tclSpecial
+    \ containedin=ALLBUT,tclComment,tclString,tclString1,tclSpecial,tclLitBlock
     \ extend
 
 syn match tclLineContinue "\\\s*$"
@@ -148,7 +149,16 @@ syn region tclProcBody
 " tepam::procedure folding
 "-------------------------------------------------------------------------------
 syn match tclTepamProc "tepam::procedure" nextgroup=tclTepamProcName skipwhite skipempty
-syn match tclTepamProcName "[a-zA-Z0-9_:]\+\|{.*}" contained nextgroup=tclProcArgs skipwhite skipempty
+syn match tclTepamProcName "[a-zA-Z0-9_:]\+\|{.*}" contained nextgroup=tclTepamProcArgs skipwhite skipempty
+
+syn region tclTepamProcArgs
+    \ matchgroup=tclBlock
+    \ start="{"
+    \ end="}"
+    \ contains=tclBlockBody
+    \ nextgroup=tclProcBody skipwhite skipempty
+    \ extend
+    \ fold
 
 "-------------------------------------------------------------------------------
 " Namespace folding
@@ -165,6 +175,16 @@ syn region tclNamespaceEvalBody
     \ transparent
     \ extend
     \ fold
+
+syn match tclStatement "regexp" nextgroup=tclLitBlock skipwhite skipempty
+
+syn region tclLitBlock
+    \ matchgroup=tclBlock
+    \ start="{"
+    \ end="}"
+    \ contains=NONE
+    \ contained
+    \ extend
 
 "-------------------------------------------------------------------------------
 " Block folding
